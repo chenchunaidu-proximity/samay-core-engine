@@ -19,7 +19,7 @@ ifeq ($(SKIP_SERVER_RUST),true)
 endif
 # Include extras if AW_EXTRAS is true
 ifeq ($(AW_EXTRAS),true)
-	SUBMODULES := $(SUBMODULES) aw-notify aw-watcher-input
+	SUBMODULES := $(SUBMODULES) aw-notify
 endif
 
 # A function that checks if a target exists in a Makefile

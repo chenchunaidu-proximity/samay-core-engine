@@ -19,6 +19,3 @@
 [submodule "aw-notify"]
 	path = aw-notify
 	url = https://github.com/ErikBjare/aw-notify.git
-[submodule "aw-watcher-input"]
-	path = aw-watcher-input
-	url = https://github.com/ActivityWatch/aw-watcher-input.git
