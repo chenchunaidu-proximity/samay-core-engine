@@ -7,9 +7,6 @@
 [submodule "aw-server"]
 	path = aw-server
 	url = https://github.com/chenchunaidu-proximity/aw-server.git
-[submodule "aw-watcher-afk"]
-	path = aw-watcher-afk
-	url = https://github.com/ActivityWatch/aw-watcher-afk.git
 [submodule "aw-qt"]
 	path = aw-qt
 	url = https://github.com/chenchunaidu-proximity/aw-qt.git

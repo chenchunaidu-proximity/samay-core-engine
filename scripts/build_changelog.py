@@ -74,7 +74,6 @@ def main():
         "aw-server",
         "aw-server-rust",
         "aw-webui",
-        "aw-watcher-afk",
         "aw-watcher-window",
         "aw-qt",
         "aw-core",
