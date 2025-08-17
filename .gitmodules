@@ -12,7 +12,7 @@
 	url = https://github.com/chenchunaidu-proximity/aw-qt.git
 [submodule "aw-watcher-window"]
 	path = aw-watcher-window
-	url = https://github.com/ActivityWatch/aw-watcher-window.git
+	url = https://github.com/chenchunaidu-proximity/aw-watcher-window.git
 [submodule "aw-notify"]
 	path = aw-notify
 	url = https://github.com/ErikBjare/aw-notify.git
