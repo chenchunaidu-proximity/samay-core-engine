@@ -284,10 +284,10 @@ Have a question, suggestion, problem, or just want to say hi? Post on [the forum
 1. **Database Connection Module** ✅ - Connects to ActivityWatch SQLite database
 2. **Sync State Manager** ✅ - Tracks synchronization progress and prevents duplicates
 3. **Configuration System** ✅ - Manages settings, environment variables, and validation
-4. **Data Processor** - Transforms events into required JSON format
-5. **HTTP Client** - Sends data to backend servers with authentication
-6. **Scheduler** - Manages automated sync intervals
-7. **Error Handler** - Manages failures and retries
+4. **Error Handling Framework** ✅ - Robust error management, retry mechanisms, and recovery
+5. **Data Processor** - Transforms events into required JSON format
+6. **HTTP Client** - Sends data to backend servers with authentication
+7. **Scheduler** - Manages automated sync intervals
 
 ## 🚀 **Getting Started**
 
@@ -316,6 +316,9 @@ python3 test_sync_manager.py
 
 # Test configuration system
 python3 test_config.py
+
+# Test error handling framework
+python3 test_error_handler.py
 ```
 
 ## 📁 **Project Structure**
@@ -327,6 +330,7 @@ samay-core-engine/
 │   ├── database.py            # Database connection module ✅
 │   ├── sync_manager.py        # Sync state management ✅
 │   ├── config.py              # Configuration management ✅
+│   ├── error_handler.py       # Error handling framework ✅
 │   ├── data_processor.py      # Data transformation (TODO)
 │   ├── http_client.py         # HTTP communication (TODO)
 │   └── scheduler.py           # Sync scheduling (TODO)
@@ -336,6 +340,7 @@ samay-core-engine/
 ├── test_database.py           # Database connection test ✅
 ├── test_sync_manager.py       # Sync state manager test ✅
 ├── test_config.py             # Configuration system test ✅
+├── test_error_handler.py      # Error handling framework test ✅
 ├── requirements.txt            # Python dependencies
 └── README.md                  # This file
 ```
@@ -478,6 +483,56 @@ config.save_config()
 
 # Load from specific environment
 prod_config = get_config(environment="production")
+```
+
+## 🛡️ **Error Handling Framework** ✅
+
+### **What It Does**
+- **Categorizes errors** by type and severity (database, network, auth, data, system)
+- **Implements retry mechanisms** with exponential backoff and jitter
+- **Provides recovery strategies** for different failure scenarios
+- **Monitors error patterns** with comprehensive logging and analysis
+- **Enables graceful degradation** and system resilience
+
+### **Key Features**
+- **16 error categories** covering all failure scenarios
+- **4 severity levels** (low, medium, high, critical)
+- **Intelligent retry logic** with configurable backoff
+- **Automatic error recovery** for common failure types
+- **Error pattern analysis** and monitoring
+- **Decorator-based error handling** for easy integration
+
+### **Usage Example**
+```python
+from samay_sync.error_handler import (
+    ErrorHandler, ErrorCategory, ErrorSeverity, handle_errors
+)
+
+# Manual error handling
+error_handler = ErrorHandler()
+try:
+    result = risky_operation()
+except Exception as e:
+    handled = error_handler.handle_error(
+        exception=e,
+        category=ErrorCategory.DATABASE_CONNECTION,
+        severity=ErrorSeverity.MEDIUM,
+        component="database",
+        operation="query"
+    )
+
+# Decorator-based error handling
+@handle_errors(
+    category=ErrorCategory.NETWORK_TIMEOUT,
+    severity=ErrorSeverity.HIGH,
+    component="http_client"
+)
+def send_data_to_server():
+    # Your code here - errors automatically handled
+    pass
+
+# Retry with exponential backoff
+result = error_handler.retry_operation(flaky_function, *args)
 ```
 
 ## 🔄 **Workflow Documentation**
@@ -636,6 +691,13 @@ python -m pytest tests/
 - ✅ Environment variable overrides
 - ✅ Configuration validation and persistence
 - ✅ Comprehensive logging configuration
+
+### **v0.4.0** - Error Handling Framework ✅
+- ✅ Comprehensive error categorization and severity levels
+- ✅ Intelligent retry mechanisms with exponential backoff
+- ✅ Error recovery strategies for different failure types
+- ✅ Error monitoring and pattern analysis
+- ✅ Decorator-based error handling for easy integration
 
 ## 🔗 **Related Projects**
 
