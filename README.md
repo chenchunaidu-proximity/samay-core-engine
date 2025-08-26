@@ -281,12 +281,13 @@ Have a question, suggestion, problem, or just want to say hi? Post on [the forum
 
 ### **Core Components**
 
-1. **Database Connection Module** - Connects to ActivityWatch SQLite database
+1. **Database Connection Module** ✅ - Connects to ActivityWatch SQLite database
 2. **Sync State Manager** ✅ - Tracks synchronization progress and prevents duplicates
-3. **Data Processor** - Transforms events into required JSON format
-4. **HTTP Client** - Sends data to backend servers with authentication
-5. **Scheduler** - Manages automated sync intervals
-6. **Error Handler** - Manages failures and retries
+3. **Configuration System** ✅ - Manages settings, environment variables, and validation
+4. **Data Processor** - Transforms events into required JSON format
+5. **HTTP Client** - Sends data to backend servers with authentication
+6. **Scheduler** - Manages automated sync intervals
+7. **Error Handler** - Manages failures and retries
 
 ## 🚀 **Getting Started**
 
@@ -312,6 +313,9 @@ python3 test_database.py
 
 # Test sync state management
 python3 test_sync_manager.py
+
+# Test configuration system
+python3 test_config.py
 ```
 
 ## 📁 **Project Structure**
@@ -320,34 +324,40 @@ python3 test_sync_manager.py
 samay-core-engine/
 ├── samay_sync/                 # Main package
 │   ├── __init__.py            # Package initialization
-│   ├── database.py            # Database connection module
+│   ├── database.py            # Database connection module ✅
 │   ├── sync_manager.py        # Sync state management ✅
+│   ├── config.py              # Configuration management ✅
 │   ├── data_processor.py      # Data transformation (TODO)
 │   ├── http_client.py         # HTTP communication (TODO)
 │   └── scheduler.py           # Sync scheduling (TODO)
 ├── scripts/                    # Utility scripts
 │   ├── run.sh                 # Start ActivityWatch dev environment
 │   └── stop.sh                # Stop ActivityWatch dev environment
-├── test_database.py           # Database connection test
+├── test_database.py           # Database connection test ✅
 ├── test_sync_manager.py       # Sync state manager test ✅
+├── test_config.py             # Configuration system test ✅
 ├── requirements.txt            # Python dependencies
 └── README.md                  # This file
 ```
 
-## 🔧 **Database Module Documentation**
+## 🗄️ **Database Module** ✅
 
-### **ActivityWatchDB Class**
+### **What It Does**
+- **Connects to ActivityWatch** SQLite database automatically
+- **Extracts all event data** with efficient batch processing
+- **Provides flexible filtering** by bucket, time range, and limits
+- **Handles database schema** correctly (eventmodel/bucketmodel tables)
+- **Ensures data integrity** with proper error handling and validation
 
-The core database connection class that handles all interactions with the ActivityWatch SQLite database.
+### **Key Features**
+- Automatic macOS database path detection
+- Context manager support for safe connections
+- Memory-efficient batch processing
+- Comprehensive data extraction (events, buckets, counts)
+- Robust error handling and logging
+- Full test coverage and validation
 
-#### **Key Features**
-- **Automatic path detection** for macOS ActivityWatch database
-- **Context manager support** for safe connection handling
-- **Batch processing** for memory-efficient data extraction
-- **Flexible filtering** by bucket, time range, and other criteria
-
-#### **Usage Examples**
-
+### **Usage Example**
 ```python
 from samay_sync.database import ActivityWatchDB
 
@@ -428,6 +438,46 @@ sync_manager.update_sync_success(
 
 # Get sync summary
 summary = sync_manager.get_sync_summary()
+```
+
+## ⚙️ **Configuration System** ✅
+
+### **What It Does**
+- **Manages all settings** through a unified configuration system
+- **Supports multiple environments** (development, staging, production)
+- **Handles environment variables** for secure configuration
+- **Validates configuration values** to prevent runtime errors
+- **Provides configuration persistence** with JSON file support
+
+### **Key Features**
+- Environment-aware configuration loading
+- Automatic validation of all settings
+- Secure handling of sensitive data
+- Configuration file management (save/load/reload)
+- Environment variable overrides
+- Comprehensive logging configuration
+
+### **Usage Example**
+```python
+from samay_sync.config import get_config, ConfigManager
+
+# Quick configuration access
+config = get_config()
+
+# Access specific settings
+db_path = config.database.db_path
+sync_interval = config.sync.sync_interval
+server_url = config.server.base_url
+
+# Update settings programmatically
+config.set_setting("database", "timeout", 60)
+config.set_setting("sync", "sync_interval", 600)
+
+# Save configuration to file
+config.save_config()
+
+# Load from specific environment
+prod_config = get_config(environment="production")
 ```
 
 ## 🔄 **Workflow Documentation**
@@ -568,17 +618,24 @@ python -m pytest tests/
 
 ## 📝 **Changelog**
 
-### **v0.1.0** - Initial Foundation
-- ✅ Database connection module
-- ✅ Event extraction functionality
-- ✅ Basic testing framework
-- ✅ Project documentation
+### **v0.1.0** - Database Module Foundation ✅
+- ✅ Database connection module (complete)
+- ✅ Event extraction functionality (complete)
+- ✅ Comprehensive testing framework (complete)
+- ✅ Full project documentation (complete)
 
 ### **v0.2.0** - Sync State Management ✅
 - ✅ Sync state manager for duplicate prevention
 - ✅ Progress tracking and failure handling
 - ✅ State persistence across restarts
 - ✅ Comprehensive sync monitoring
+
+### **v0.3.0** - Configuration System ✅
+- ✅ Unified configuration management system
+- ✅ Environment-aware settings (dev/staging/prod)
+- ✅ Environment variable overrides
+- ✅ Configuration validation and persistence
+- ✅ Comprehensive logging configuration
 
 ## 🔗 **Related Projects**
 
