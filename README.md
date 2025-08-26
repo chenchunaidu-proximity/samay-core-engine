@@ -263,3 +263,289 @@ Want to help? Great! Check out the [CONTRIBUTING.md file](./CONTRIBUTING.md)!
 
 Have a question, suggestion, problem, or just want to say hi? Post on [the forum](https://forum.activitywatch.net/)!
 
+# Samay Core Engine - ActivityWatch Data Synchronization
+
+## 🎯 **Project Overview**
+
+**Samay** is a robust data synchronization system that extracts activity data from ActivityWatch and sends it to external servers. The system is designed to be resilient, efficient, and maintainable.
+
+## 🏗️ **Architecture Overview**
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│  ActivityWatch  │    │   Samay Sync     │    │   Backend       │
+│   Database      │───▶│    Engine        │───▶│   Server        │
+│  (SQLite)       │    │                  │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### **Core Components**
+
+1. **Database Connection Module** - Connects to ActivityWatch SQLite database
+2. **Sync State Manager** - Tracks synchronization progress and prevents duplicates
+3. **Data Processor** - Transforms events into required JSON format
+4. **HTTP Client** - Sends data to backend servers with authentication
+5. **Scheduler** - Manages automated sync intervals
+6. **Error Handler** - Manages failures and retries
+
+## 🚀 **Getting Started**
+
+### **Prerequisites**
+- Python 3.8+
+- ActivityWatch running and collecting data
+- Access to ActivityWatch SQLite database
+
+### **Installation**
+```bash
+# Clone the repository
+git clone <repository-url>
+cd samay-core-engine
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+### **Quick Test**
+```bash
+# Test database connection
+python3 test_database.py
+
+# Investigate database structure
+python3 investigate_db.py
+```
+
+## 📁 **Project Structure**
+
+```
+samay-core-engine/
+├── samay_sync/                 # Main package
+│   ├── __init__.py            # Package initialization
+│   ├── database.py            # Database connection module
+│   ├── sync_manager.py        # Sync state management (TODO)
+│   ├── data_processor.py      # Data transformation (TODO)
+│   ├── http_client.py         # HTTP communication (TODO)
+│   └── scheduler.py           # Sync scheduling (TODO)
+├── scripts/                    # Utility scripts
+│   ├── run.sh                 # Start ActivityWatch dev environment
+│   └── stop.sh                # Stop ActivityWatch dev environment
+├── test_database.py           # Database connection test
+├── investigate_db.py          # Database structure investigation
+├── requirements.txt            # Python dependencies
+└── README.md                  # This file
+```
+
+## 🔧 **Database Module Documentation**
+
+### **ActivityWatchDB Class**
+
+The core database connection class that handles all interactions with the ActivityWatch SQLite database.
+
+#### **Key Features**
+- **Automatic path detection** for macOS ActivityWatch database
+- **Context manager support** for safe connection handling
+- **Batch processing** for memory-efficient data extraction
+- **Flexible filtering** by bucket, time range, and other criteria
+
+#### **Usage Examples**
+
+```python
+from samay_sync.database import ActivityWatchDB
+
+# Basic usage with context manager
+with ActivityWatchDB() as db:
+    # Get database information
+    info = db.get_database_info()
+    print(f"Total events: {info['total_events']}")
+    
+    # Get all buckets
+    buckets = db.get_buckets()
+    for bucket in buckets:
+        print(f"Bucket: {bucket['id']}")
+    
+    # Get events with filtering
+    events = db.get_events(
+        bucket_id="aw-watcher-window_hostname",
+        limit=100,
+        start_time=datetime.now() - timedelta(days=1)
+    )
+    
+    # Process events in batches (memory efficient)
+    for batch in db.get_events_generator(batch_size=1000):
+        process_batch(batch)
+```
+
+#### **Database Schema**
+
+The system works with ActivityWatch's actual database structure:
+
+**Tables:**
+- `bucketmodel` - Data source buckets (window watcher, AFK watcher, etc.)
+- `eventmodel` - Individual activity events
+
+**Key Fields:**
+- `eventmodel.id` - Unique event identifier
+- `eventmodel.bucket_id` - Reference to bucket
+- `eventmodel.timestamp` - When the event occurred
+- `eventmodel.duration` - How long the event lasted
+- `eventmodel.datastr` - JSON string containing event data
+
+## 🔄 **Workflow Documentation**
+
+### **Data Flow Process**
+
+```
+1. Database Connection
+   ├── Validate database path
+   ├── Establish SQLite connection
+   └── Verify table structure
+
+2. Event Extraction
+   ├── Query events with filtering
+   ├── Parse JSON data from datastr
+   ├── Join with bucket information
+   └── Return structured event data
+
+3. Sync State Management (TODO)
+   ├── Track last sync timestamp
+   ├── Identify new events since last sync
+   ├── Prevent duplicate data transmission
+   └── Handle sync failures gracefully
+
+4. Data Processing (TODO)
+   ├── Transform events to required format
+   ├── Add user authentication headers
+   ├── Validate data integrity
+   └── Prepare for transmission
+
+5. HTTP Transmission (TODO)
+   ├── Send data to backend server
+   ├── Handle authentication
+   ├── Respect rate limits
+   └── Manage retries on failure
+
+6. Sync Completion (TODO)
+   ├── Update sync state
+   ├── Log successful transmission
+   ├── Handle any errors
+   └── Schedule next sync
+```
+
+### **Error Handling Strategy**
+
+```
+Error Type          | Action                    | Retry Strategy
+────────────────────|───────────────────────────|─────────────────
+Database Connection | Log error, exit gracefully| Manual restart
+Invalid Data        | Skip event, log warning   | Continue with next
+Network Failure     | Queue for retry           | Exponential backoff
+Server Error        | Log error, retry later    | Scheduled retry
+Authentication      | Log error, stop sync      | Manual intervention
+```
+
+## 📊 **Configuration**
+
+### **Database Paths**
+- **macOS**: `~/Library/Application Support/activitywatch/aw-server/peewee-sqlite.v2.db`
+- **Linux**: `~/.local/share/activitywatch/aw-server/peewee-sqlite.v2.db`
+- **Windows**: `%APPDATA%\activitywatch\aw-server\peewee-sqlite.v2.db`
+
+### **Environment Variables**
+```bash
+# Database path override
+SAMAY_DB_PATH=/custom/path/to/database.db
+
+# Log level
+SAMAY_LOG_LEVEL=INFO
+
+# Sync interval (seconds)
+SAMAY_SYNC_INTERVAL=300
+```
+
+## 🧪 **Testing**
+
+### **Running Tests**
+```bash
+# Test database connection
+python3 test_database.py
+
+# Investigate database structure
+python3 investigate_db.py
+
+# Run all tests (when implemented)
+python -m pytest tests/
+```
+
+### **Test Coverage**
+- ✅ Database connection and validation
+- ✅ Event extraction and filtering
+- ✅ Bucket information retrieval
+- ✅ Batch processing functionality
+- ❌ Sync state management (TODO)
+- ❌ Data processing (TODO)
+- ❌ HTTP client (TODO)
+- ❌ Error handling (TODO)
+
+## 🚧 **Development Status**
+
+### **Completed Components**
+- ✅ Database connection module
+- ✅ Event extraction logic
+- ✅ Database schema mapping
+- ✅ Test scripts
+
+### **In Progress**
+- 🔄 Documentation and architecture planning
+
+### **Next Priorities**
+1. **Sync State Manager** - Track sync progress and prevent duplicates
+2. **Configuration System** - Manage settings and paths
+3. **Error Handling Framework** - Robust failure management
+4. **Data Processing Pipeline** - Transform events to required format
+
+### **Waiting For**
+- Backend team specifications:
+  - JSON data structure requirements
+  - API endpoint details
+  - Authentication format
+  - Rate limiting constraints
+
+## 🤝 **Contributing**
+
+### **Development Workflow**
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Implement** your changes
+4. **Test** thoroughly
+5. **Document** any new functionality
+6. **Submit** a pull request
+
+### **Code Standards**
+- **Python**: PEP 8 compliance
+- **Documentation**: Comprehensive docstrings
+- **Testing**: Unit tests for all new functionality
+- **Logging**: Appropriate log levels and messages
+
+## 📝 **Changelog**
+
+### **v0.1.0** - Initial Foundation
+- ✅ Database connection module
+- ✅ Event extraction functionality
+- ✅ Basic testing framework
+- ✅ Project documentation
+
+## 🔗 **Related Projects**
+
+- **ActivityWatch**: [https://activitywatch.net/](https://activitywatch.net/)
+- **ActivityWatch GitHub**: [https://github.com/ActivityWatch/activitywatch](https://github.com/ActivityWatch/activitywatch)
+
+## 📞 **Support**
+
+For questions, issues, or contributions:
+- **Issues**: Create a GitHub issue
+- **Discussions**: Use GitHub discussions
+- **Documentation**: Check this README and inline code documentation
+
+---
+
+**Built with ❤️ by the Samay Team**
+
