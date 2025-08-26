@@ -5,8 +5,19 @@ Samay Sync - ActivityWatch Data Synchronization System
 from .database import ActivityWatchDB
 from .sync_manager import SyncStateManager, SyncState
 from .config import ConfigManager, get_config, Environment
+from .error_handler import (
+    ErrorHandler, ErrorMonitor, RetryStrategy, RetryConfig,
+    ErrorCategory, ErrorSeverity, ErrorRecovery,
+    handle_errors, get_error_handler
+)
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __author__ = "Samay Team"
 
-__all__ = ["ActivityWatchDB", "SyncStateManager", "SyncState", "ConfigManager", "get_config", "Environment"]
+__all__ = [
+    "ActivityWatchDB", "SyncStateManager", "SyncState", 
+    "ConfigManager", "get_config", "Environment",
+    "ErrorHandler", "ErrorMonitor", "RetryStrategy", "RetryConfig",
+    "ErrorCategory", "ErrorSeverity", "ErrorRecovery",
+    "handle_errors", "get_error_handler"
+]
