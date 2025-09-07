@@ -172,7 +172,7 @@ if platform.system() == "Darwin":
         aws_coll,
         aww_coll,
         aw_notify_coll,
-        name="ActivityWatch.app",
+        name="Samay.app",
         icon=icon,
         bundle_identifier="net.activitywatch.ActivityWatch",
         version=current_release.lstrip("v"),

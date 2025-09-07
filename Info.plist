@@ -5,7 +5,7 @@
     <key>CFBundleIdentifier</key>
     <string>com.activitywatch.aw-server</string>
     <key>CFBundleName</key>
-    <string>ActivityWatch Server</string>
+    <string>Samay Server</string>
     <key>CFBundleVersion</key>
     <string>1.0.0</string>
     <key>CFBundleShortVersionString</key>
@@ -20,7 +20,7 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
-            <string>ActivityWatch URL Scheme</string>
+            <string>Samay URL Scheme</string>
             <key>CFBundleURLSchemes</key>
             <array>
                 <string>activitywatch</string>
