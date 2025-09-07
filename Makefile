@@ -146,13 +146,13 @@ aw-qt/media/logo/logo.icns:
 	rm -R build/MyIcon.iconset
 	mv build/MyIcon.icns aw-qt/media/logo/logo.icns
 
-dist/ActivityWatch.app: aw-qt/media/logo/logo.icns
+dist/Samay.app: aw-qt/media/logo/logo.icns
 	pyinstaller --clean --noconfirm aw.spec
 
-dist/ActivityWatch.dmg: dist/ActivityWatch.app
+dist/Samay.dmg: dist/Samay.app
 	# NOTE: This does not codesign the dmg, that is done in the CI config
 	pip install dmgbuild
-	dmgbuild -s scripts/package/dmgbuild-settings.py -D app=dist/ActivityWatch.app "ActivityWatch" dist/ActivityWatch.dmg
+	dmgbuild -s scripts/package/dmgbuild-settings.py -D app=dist/Samay.app "Samay" dist/Samay.dmg
 
 dist/notarize:
 	./scripts/notarize.sh

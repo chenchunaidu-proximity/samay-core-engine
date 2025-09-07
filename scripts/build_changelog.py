@@ -409,7 +409,7 @@ See the [getting started guide in the documentation](https://docs.activitywatch.
         output += f"""# Downloads
 
  - [**Windows**](https://github.com/ActivityWatch/activitywatch/releases/download/{tag}/activitywatch-{tag}-windows-x86_64-setup.exe) (.exe, installer)
- - [**macOS**](https://github.com/ActivityWatch/activitywatch/releases/download/{tag}/activitywatch-{tag}-macos-x86_64.dmg) (.dmg)
+ - [**macOS**](https://github.com/ActivityWatch/activitywatch/releases/download/{tag}/samay-{tag}-macos-x86_64.dmg) (.dmg)
  - [**Linux**](https://github.com/ActivityWatch/activitywatch/releases/download/{tag}/activitywatch-{tag}-linux-x86_64.zip) (.zip)
      """.strip()
         output += "\n\n"

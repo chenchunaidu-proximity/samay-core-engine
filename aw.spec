@@ -174,7 +174,7 @@ if platform.system() == "Darwin":
         aw_notify_coll,
         name="Samay.app",
         icon=icon,
-        bundle_identifier="net.activitywatch.ActivityWatch",
+        bundle_identifier="net.samay.Samay",
         version=current_release.lstrip("v"),
         info_plist={
             "NSPrincipalClass": "NSApplication",
