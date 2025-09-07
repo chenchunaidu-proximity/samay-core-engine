@@ -86,9 +86,7 @@ aw_server_rust_location = Path("aw-server-rust")
 aw_server_rust_bin = aw_server_rust_location / "target/package/aw-server-rust"
 aw_sync_bin = aw_server_rust_location / "target/package/aw-sync"
 aw_qt_location = Path("aw-qt")
-awa_location = Path("aw-watcher-afk")
 aww_location = Path("aw-watcher-window")
-awi_location = Path("aw-watcher-input")
 aw_notify_location = Path("aw-notify")
 
 if platform.system() == "Darwin":
@@ -121,33 +119,6 @@ aw_server_a = build_analysis(
         (aw_core_path / "schemas", "aw_core/schemas"),
     ],
 )
-aw_watcher_afk_a = build_analysis(
-    "aw_watcher_afk",
-    awa_location,
-    hiddenimports=[
-        "Xlib.keysymdef.miscellany",
-        "Xlib.keysymdef.latin1",
-        "Xlib.keysymdef.latin2",
-        "Xlib.keysymdef.latin3",
-        "Xlib.keysymdef.latin4",
-        "Xlib.keysymdef.greek",
-        "Xlib.support.unix_connect",
-        "Xlib.ext.shape",
-        "Xlib.ext.xinerama",
-        "Xlib.ext.composite",
-        "Xlib.ext.randr",
-        "Xlib.ext.xfixes",
-        "Xlib.ext.security",
-        "Xlib.ext.xinput",
-        "pynput.keyboard._xorg",
-        "pynput.mouse._xorg",
-        "pynput.keyboard._win32",
-        "pynput.mouse._win32",
-        "pynput.keyboard._darwin",
-        "pynput.mouse._darwin",
-    ],
-)
-aw_watcher_input_a = build_analysis("aw_watcher_input", awi_location)
 aw_watcher_window_a = build_analysis(
     "aw_watcher_window",
     aww_location,
@@ -175,9 +146,7 @@ aw_notify_a = build_analysis(
 MERGE(
     (aw_server_a, "aw-server", "aw-server"),
     (aw_qt_a, "aw-qt", "aw-qt"),
-    (aw_watcher_afk_a, "aw-watcher-afk", "aw-watcher-afk"),
     (aw_watcher_window_a, "aw-watcher-window", "aw-watcher-window"),
-    (aw_watcher_input_a, "aw-watcher-input", "aw-watcher-input"),
     (aw_notify_a, "aw-notify", "aw-notify"),
 )
 
@@ -188,18 +157,12 @@ aws_coll = build_collect(aw_server_a, "aw-server")
 # aw-watcher-window
 aww_coll = build_collect(aw_watcher_window_a, "aw-watcher-window")
 
-# aw-watcher-afk
-awa_coll = build_collect(aw_watcher_afk_a, "aw-watcher-afk")
-
 # aw-qt
 awq_coll = build_collect(
     aw_qt_a,
     "aw-qt",
     console=False if platform.system() == "Windows" else True,
 )
-
-# aw-watcher-input
-awi_coll = build_collect(aw_watcher_input_a, "aw-watcher-input")
 
 aw_notify_coll = build_collect(aw_notify_a, "aw-notify")
 
@@ -208,8 +171,6 @@ if platform.system() == "Darwin":
         awq_coll,
         aws_coll,
         aww_coll,
-        awa_coll,
-        awi_coll,
         aw_notify_coll,
         name="ActivityWatch.app",
         icon=icon,
