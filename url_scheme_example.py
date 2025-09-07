@@ -20,13 +20,14 @@ SERVER_URL = "http://localhost:5600"
 API_BASE = f"{SERVER_URL}/api/0"
 
 def test_url_scheme_token():
-    """Test the URL scheme token functionality."""
+    """Test the URL scheme token and URL functionality."""
     
-    # Example token (replace with your actual token)
+    # Example token and URL (replace with your actual values)
     test_token = "your-auth-token-here"
+    test_url = "http://localhost:4000/activities"
     
-    # Create URL scheme format
-    url_scheme = f"activitywatch://token?token={test_token}"
+    # Create URL scheme format with both token and URL
+    url_scheme = f"activitywatch://token?token={test_token}&url={test_url}"
     
     print(f"Testing URL scheme: {url_scheme}")
     
@@ -39,10 +40,10 @@ def test_url_scheme_token():
         )
         
         if response.status_code == 200:
-            print("✅ URL scheme token stored successfully!")
+            print("✅ URL scheme token and URL stored successfully!")
             print(f"Response: {response.json()}")
         else:
-            print(f"❌ Failed to store token: {response.status_code}")
+            print(f"❌ Failed to store token and URL: {response.status_code}")
             print(f"Error: {response.text}")
             return False
             
@@ -68,20 +69,21 @@ def test_token_endpoints():
     except requests.exceptions.RequestException as e:
         print(f"❌ Error getting token: {e}")
     
-    # Test storing token directly
+    # Test storing token and URL directly
     test_token = "direct-storage-test-token"
+    test_url = "http://localhost:4000/activities"
     try:
         response = requests.post(
             f"{API_BASE}/token",
-            json={"token": test_token},
+            json={"token": test_token, "url": test_url},
             headers={"Content-Type": "application/json"}
         )
         if response.status_code == 200:
-            print(f"✅ Token stored directly: {response.json()}")
+            print(f"✅ Token and URL stored directly: {response.json()}")
         else:
-            print(f"❌ Failed to store token directly: {response.status_code}")
+            print(f"❌ Failed to store token and URL directly: {response.status_code}")
     except requests.exceptions.RequestException as e:
-        print(f"❌ Error storing token: {e}")
+        print(f"❌ Error storing token and URL: {e}")
     
     # Test deleting token
     try:
@@ -138,9 +140,10 @@ def main():
     print("Test completed!")
     print("\nTo use this in a real scenario:")
     print("1. Replace 'your-auth-token-here' with your actual token")
-    print("2. Use the URL scheme: activitywatch://token?token=YOUR_TOKEN")
-    print("3. The scheduler will automatically use this token every 10 minutes")
-    print("4. Events will be sent to http://localhost:3000/activities")
+    print("2. Replace the URL with your actual backend API endpoint")
+    print("3. Use the URL scheme: activitywatch://token?token=YOUR_TOKEN&url=YOUR_API_URL")
+    print("4. The scheduler will automatically use this token and URL every 10 minutes")
+    print("5. Events will be sent to the configured API endpoint")
 
 if __name__ == "__main__":
     main()
