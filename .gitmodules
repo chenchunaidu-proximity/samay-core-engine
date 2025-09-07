@@ -15,4 +15,4 @@
 	url = https://github.com/chenchunaidu-proximity/aw-watcher-window.git
 [submodule "aw-notify"]
 	path = aw-notify
-	url = https://github.com/ErikBjare/aw-notify.git
+	url = https://github.com/chenchunaidu-proximity/aw-notify.git
