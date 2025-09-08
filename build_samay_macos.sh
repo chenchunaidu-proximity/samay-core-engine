@@ -57,9 +57,15 @@ check_python() {
 clean_build() {
     print_status "Cleaning previous builds..."
     
-    if [ -d "venv" ]; then
-        rm -rf venv
-        print_success "Removed old virtual environment"
+    # Check if venv exists and is working
+    if [ -d "venv" ] && [ -f "venv/bin/python3" ] && [ -x "venv/bin/python3" ]; then
+        print_success "Virtual environment already exists and is working - keeping it"
+    else
+        # Remove old virtual environment only if it's broken
+        if [ -d "venv" ]; then
+            rm -rf venv
+            print_success "Removed broken virtual environment"
+        fi
     fi
     
     if [ -d "build" ]; then
@@ -87,33 +93,119 @@ clean_build() {
 setup_venv() {
     print_status "Setting up Python virtual environment..."
     
-    python3 -m venv venv
+    # Check if venv already exists and is working (unless force recreate is requested)
+    if [ "$FORCE_RECREATE_VENV" != "true" ] && [ -d "venv" ] && [ -f "venv/bin/python3" ] && [ -x "venv/bin/python3" ]; then
+        # Test if the venv is actually functional
+        if venv/bin/python3 -c "import sys; print('OK')" >/dev/null 2>&1; then
+            print_success "Virtual environment already exists and is working - skipping creation"
+            print_status "Checking if dependencies are installed..."
+            
+            # Check if key dependencies are installed
+            if venv/bin/python3 -c "import PyQt6, flask, pyinstaller" >/dev/null 2>&1; then
+                print_success "Key dependencies are already installed - using existing venv"
+                return 0
+            else
+                print_warning "Virtual environment exists but missing dependencies - will reinstall"
+            fi
+        else
+            print_warning "Virtual environment exists but is broken - will recreate"
+        fi
+    fi
     
-    # Wait a moment for venv to be fully created
-    sleep 1
+    print_status "Creating virtual environment..."
     
-    print_status "Activating virtual environment..."
-    source venv/bin/activate
+    # Retry venv creation up to 3 times
+    local venv_created=false
+    for attempt in 1 2 3; do
+        print_status "Attempting to create virtual environment (attempt $attempt/3)..."
+        
+        # Remove any partial venv from previous attempts
+        if [ $attempt -gt 1 ] && [ -d "venv" ]; then
+            rm -rf venv
+            print_status "Cleaned up partial virtual environment from previous attempt"
+        fi
+        
+        python3 -m venv venv
+        
+        # Check if venv creation was successful
+        if [ $? -eq 0 ] && [ -d "venv" ] && [ -f "venv/bin/python3" ]; then
+            print_success "Virtual environment created successfully (attempt $attempt)"
+            venv_created=true
+            break
+        else
+            print_warning "Virtual environment creation failed (attempt $attempt/3)"
+            if [ $attempt -lt 3 ]; then
+                print_status "Retrying in 3 seconds..."
+                sleep 3
+            fi
+        fi
+    done
+    
+    # Check if venv was created successfully
+    if [ "$venv_created" != "true" ]; then
+        print_error "Failed to create virtual environment after 3 attempts"
+        print_error "Checking if venv directory exists:"
+        ls -la venv/ 2>/dev/null || echo "venv directory does not exist"
+        print_error "Please check your Python installation and try again"
+        exit 1
+    fi
+    
+    print_status "Virtual environment created, waiting for it to be ready..."
+    
+    # Wait for venv to be fully created and verify it exists
+    local max_attempts=20
+    local attempt=1
+    
+    while [ $attempt -le $max_attempts ]; do
+        if [ -f "venv/bin/python3" ] && [ -x "venv/bin/python3" ]; then
+            print_success "Virtual environment created successfully (attempt $attempt)"
+            break
+        fi
+        
+        print_status "Waiting for virtual environment... (attempt $attempt/$max_attempts)"
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    
+    # Verify venv was created successfully
+    if [ ! -f "venv/bin/python3" ] || [ ! -x "venv/bin/python3" ]; then
+        print_error "Failed to create virtual environment after $max_attempts attempts"
+        print_error "Checking venv directory contents:"
+        ls -la venv/ 2>/dev/null || echo "venv directory does not exist"
+        exit 1
+    fi
     
     print_status "Upgrading pip..."
-    pip install --upgrade pip
     
-    print_success "Virtual environment created and activated"
+    # Wait for pip to be available
+    local pip_attempts=0
+    while [ $pip_attempts -lt 10 ]; do
+        if venv/bin/python3 -m pip --version >/dev/null 2>&1; then
+            break
+        fi
+        print_status "Waiting for pip to be available... ($pip_attempts/10)"
+        sleep 1
+        pip_attempts=$((pip_attempts + 1))
+    done
+    
+    venv/bin/python3 -m pip install --upgrade pip
+    
+    print_success "Virtual environment created successfully"
 }
 
 # Function to install dependencies
 install_dependencies() {
     print_status "Installing core dependencies..."
     
-    pip install PyQt6 flask flask-restx flask-cors werkzeug pyinstaller requests
+    venv/bin/pip install PyQt6 flask flask-restx flask-cors werkzeug pyinstaller requests
     
     print_status "Installing project modules..."
-    pip install -e aw-core
-    pip install -e aw-client
-    pip install -e aw-server
-    pip install -e aw-qt
-    pip install -e aw-notify
-    pip install -e aw-watcher-window
+    venv/bin/pip install -e aw-core
+    venv/bin/pip install -e aw-client
+    venv/bin/pip install -e aw-server
+    venv/bin/pip install -e aw-qt
+    venv/bin/pip install -e aw-notify
+    venv/bin/pip install -e aw-watcher-window
     
     print_success "All dependencies installed"
 }
@@ -131,7 +223,7 @@ fix_static_directory() {
 build_app() {
     print_status "Building Samay macOS app..."
     
-    pyinstaller --clean --noconfirm aw.spec
+    venv/bin/pyinstaller --clean --noconfirm aw.spec
     
     print_success "Build completed successfully!"
 }
@@ -203,20 +295,23 @@ show_usage() {
     echo "Usage: $0 [OPTIONS]"
     echo ""
     echo "Options:"
-    echo "  --clean-only    Only clean previous builds"
-    echo "  --no-dmg        Skip DMG creation"
-    echo "  --help          Show this help message"
+    echo "  --clean-only           Only clean previous builds"
+    echo "  --no-dmg               Skip DMG creation"
+    echo "  --force-recreate-venv  Force recreation of virtual environment"
+    echo "  --help                 Show this help message"
     echo ""
     echo "Examples:"
-    echo "  $0              # Full build process"
-    echo "  $0 --clean-only # Only clean"
-    echo "  $0 --no-dmg     # Build without DMG"
+    echo "  $0                        # Full build process"
+    echo "  $0 --clean-only           # Only clean"
+    echo "  $0 --no-dmg               # Build without DMG"
+    echo "  $0 --force-recreate-venv  # Force recreate venv (useful for dependency updates)"
 }
 
 # Main build function
 main() {
     local CREATE_DMG=true
     local CLEAN_ONLY=false
+    local FORCE_RECREATE_VENV=false
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -227,6 +322,10 @@ main() {
                 ;;
             --no-dmg)
                 CREATE_DMG=false
+                shift
+                ;;
+            --force-recreate-venv)
+                FORCE_RECREATE_VENV=true
                 shift
                 ;;
             --help)
