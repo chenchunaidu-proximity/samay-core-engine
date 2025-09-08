@@ -85,6 +85,7 @@ declare -a test_files=(
     "test_oauth_manager.py:OAuth Manager Tests"
     "test_sync_manager.py:Sync Manager Tests"
     "test_tray_integration.py:Tray Integration Tests"
+    "test_integration.py:Dashboard Integration Tests"
 )
 
 # Track results

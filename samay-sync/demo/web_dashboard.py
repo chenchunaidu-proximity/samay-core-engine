@@ -136,11 +136,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 # Simulate successful login for demo
                 oauth_manager.token_storage.store_tokens('demo_access_token', 'demo_refresh_token', 3600)
                 
+                # Run the run.sh script after successful login
+                self.run_script_after_login()
+                
                 result = {
                     "status": "success", 
-                    "message": "Login successful!",
+                    "message": "Login successful! Starting ActivityWatch services...",
                     "auth_url": auth_url,
-                    "token_stored": True
+                    "token_stored": True,
+                    "services_started": True
                 }
             
             self.send_response(200)
@@ -156,7 +160,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
             oauth_manager = OAuthManager()
             if oauth_manager.is_authenticated():
                 oauth_manager.logout()
-                result = {"status": "success", "message": "Logout successful!"}
+                
+                # Run the stop.sh script after logout
+                self.run_script_after_logout()
+                
+                result = {"status": "success", "message": "Logout successful! Stopping ActivityWatch services..."}
             else:
                 result = {"status": "not_authenticated", "message": "Not logged in"}
             
@@ -166,6 +174,76 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(result).encode())
         except Exception as e:
             self.send_error(500, str(e))
+    
+    def run_script_after_login(self):
+        """Run the run.sh script after successful login"""
+        try:
+            import subprocess
+            import threading
+            
+            # Get the samay-sync directory (parent of demo)
+            samay_sync_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            run_script_path = os.path.join(samay_sync_dir, "scripts", "run.sh")
+            
+            if os.path.exists(run_script_path):
+                # Run the script in a separate thread to avoid blocking the HTTP response
+                def run_script():
+                    try:
+                        print(f"🚀 Executing run.sh from: {run_script_path}")
+                        # Use Popen instead of run to avoid blocking
+                        process = subprocess.Popen([run_script_path], cwd=samay_sync_dir, 
+                                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print(f"✅ run.sh started with PID: {process.pid}")
+                        # Don't wait for completion - let it run in background
+                    except subprocess.CalledProcessError as e:
+                        print(f"❌ Error running run.sh: {e}")
+                    except Exception as e:
+                        print(f"❌ Unexpected error running run.sh: {e}")
+                
+                # Start the script in a background thread
+                script_thread = threading.Thread(target=run_script, daemon=True)
+                script_thread.start()
+                print(f"🚀 Starting ActivityWatch services via run.sh...")
+            else:
+                print(f"⚠️ run.sh not found at: {run_script_path}")
+                
+        except Exception as e:
+            print(f"❌ Error in run_script_after_login: {e}")
+    
+    def run_script_after_logout(self):
+        """Run the stop.sh script after logout"""
+        try:
+            import subprocess
+            import threading
+            
+            # Get the samay-sync directory (parent of demo)
+            samay_sync_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            stop_script_path = os.path.join(samay_sync_dir, "scripts", "stop.sh")
+            
+            if os.path.exists(stop_script_path):
+                # Run the script in a separate thread to avoid blocking the HTTP response
+                def run_script():
+                    try:
+                        print(f"🛑 Executing stop.sh from: {stop_script_path}")
+                        # Use Popen instead of run to avoid blocking
+                        process = subprocess.Popen([stop_script_path], cwd=samay_sync_dir, 
+                                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        print(f"✅ stop.sh started with PID: {process.pid}")
+                        # Don't wait for completion - let it run in background
+                    except subprocess.CalledProcessError as e:
+                        print(f"❌ Error running stop.sh: {e}")
+                    except Exception as e:
+                        print(f"❌ Unexpected error running stop.sh: {e}")
+                
+                # Start the script in a background thread
+                script_thread = threading.Thread(target=run_script, daemon=True)
+                script_thread.start()
+                print(f"🛑 Stopping ActivityWatch services via stop.sh...")
+            else:
+                print(f"⚠️ stop.sh not found at: {stop_script_path}")
+                
+        except Exception as e:
+            print(f"❌ Error in run_script_after_logout: {e}")
     
     def serve_api_database(self):
         """Serve API database endpoint"""

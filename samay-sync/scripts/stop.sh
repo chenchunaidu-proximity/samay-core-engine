@@ -39,8 +39,8 @@ else
   echo -e "${GREEN}✅ Port $PORT is free.${NC}"
 fi
 
-# Remove venv from parent folder
-VENV_PATH="$(dirname "$0")/../venv"
+# Remove venv from project root folder (go up two directories from samay-sync/scripts/)
+VENV_PATH="$(dirname "$0")/../../venv"
 
 if [ -d "$VENV_PATH" ]; then
   echo -e "${YELLOW}⚠️  Removing existing virtual environment ($VENV_PATH)...${NC}"

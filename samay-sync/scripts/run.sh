@@ -12,8 +12,8 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-# Root path
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Root path (go up two directories from samay-sync/scripts/ to project root)
+PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SERVER_URL="http://localhost:5600"
 
 echo -e "${CYAN}${BOLD}--- Samay Dev Setup ---${NC}"
