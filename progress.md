@@ -40,18 +40,31 @@ This document tracks the progress made in the `demo_prep` branch, documenting ke
 ## Files Added/Modified
 
 ### New Files Created
-- `Info.plist` - macOS app configuration with URL scheme support
-- `URL_SCHEME_README.md` - Comprehensive documentation for URL scheme functionality
-- `url_scheme_example.py` - Example script for testing URL scheme integration
+- **`/Info.plist`** - macOS app configuration with URL scheme support
+- **`/URL_SCHEME_README.md`** - Comprehensive documentation for URL scheme functionality
+- **`/url_scheme_example.py`** - Example script for testing URL scheme integration
 
 ### Modified Files
-- `aw.spec` - Updated PyInstaller configuration for custom branding
-- `Makefile` - Updated build targets for "Samay" branding
-- `scripts/notarize.sh` - Updated bundle identifiers and file paths
-- `scripts/package/activitywatch-setup.iss` - Updated Windows installer branding
-- `scripts/package/dmgbuild-settings.py` - Updated DMG build settings
-- `scripts/build_changelog.py` - Fixed macOS download link naming
-- `.gitmodules` - Updated submodule URLs to custom repositories
+- **`/aw.spec`** - Updated PyInstaller configuration for custom branding
+- **`/Makefile`** - Updated build targets for "Samay" branding
+- **`/scripts/notarize.sh`** - Updated bundle identifiers and file paths
+- **`/scripts/package/activitywatch-setup.iss`** - Updated Windows installer branding
+- **`/scripts/package/dmgbuild-settings.py`** - Updated DMG build settings
+- **`/scripts/build_changelog.py`** - Fixed macOS download link naming
+- **`/.gitmodules`** - Updated submodule URLs to custom repositories
+
+### Submodule Updates
+- **`/aw-core/`** - Updated to custom repository (`chenchunaidu-proximity/aw-core.git`)
+- **`/aw-notify/`** - Updated to custom repository (`chenchunaidu-proximity/aw-notify.git`)
+- **`/aw-qt/`** - Updated to newer commit
+- **`/aw-server/`** - Updated to newer commit
+- **`/aw-watcher-window/`** - Updated to newer commit
+
+### Key Code Changes in Server Files
+- **`/aw-server/aw_server/api.py`** - Added token management and URL scheme handling endpoints
+- **`/aw-server/aw_server/rest.py`** - Added REST API endpoints for `/token` and `/url-scheme`
+- **`/aw-server/aw_server/scheduler.py`** - Modified to send events to backend API every 10 minutes
+- **`/aw-server/aw_server/server.py`** - Updated to include new API endpoints and token storage
 
 ## API Endpoints Added
 
