@@ -1,7 +1,28 @@
-# ActivityWatch Demo Progress Tracking
+# Samay Core Engine Progress Tracking
 
-## Overview
-This document tracks the progress made in the `demo_prep` branch, documenting key features and customizations implemented for the ActivityWatch demo.
+## Project Architecture Overview
+
+### **Core Engine (Our Team - What we're developing):**
+- **User Installation**: App installation process
+- **Authentication UI**: Login/sign-in button interface  
+- **Web Redirect**: Redirect users to authentication webpage
+- **Token Management**: Store authentication tokens locally
+- **Logout Functionality**: Option for users to logout
+- **Data Transmission**: Send activity data along with token to backend API
+
+### **Backend (Team B - Out of scope):**
+- **API Development**: Create REST APIs for authentication and data
+- **Data Storage**: Database management and data persistence
+- **Security**: Authentication, authorization, and data protection
+
+### **Frontend (Team F - Out of scope):**
+- **Login Flow**: Implement authentication UI/UX
+- **Data Visualization**: Fetch and display activity data
+- **Analytics**: Summarize and present user activity insights
+
+## Core Engine Implementation Status
+
+This document tracks the progress made in the `demo_prep` branch, documenting the Core Engine implementation for the Samay activity tracking system.
 
 ## Key Features Implemented
 
@@ -167,13 +188,13 @@ Use the provided test script to verify functionality:
 python url_scheme_example.py
 ```
 
-## Status
-- ✅ URL scheme integration implemented
-- ✅ Token storage and management working
-- ✅ Backend API synchronization implemented
-- ✅ Custom branding applied
-- ✅ Documentation created
-- ✅ Test script provided
+## Core Engine Implementation Status
+- ✅ **Authentication Flow**: URL scheme integration implemented
+- ✅ **Token Management**: Token storage and management working
+- ✅ **Data Transmission**: Backend API synchronization implemented
+- ✅ **User Experience**: Custom "Samay" branding applied
+- ✅ **Documentation**: Implementation documentation created
+- ✅ **Testing**: Test script provided for validation
 
 ## Next Steps
 - [ ] Test URL scheme functionality in production environment
