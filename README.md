@@ -12,3 +12,11 @@ This repo is used for creating dekstop app for samay. This app tracks user activ
 6. You can run build by running `make build` in main folder
 7. You build .dmg file by running `make dist/Samay.dmg`
 8. It will create dmg file under `dist` folder
+
+## Logs
+
+1. You can check if something is wrong in logs
+2. Click on app icon upper bar
+3. Click on open log folder
+4. It will open a folder with 5 sub folders
+5. You can logs in any one of them to check logs
