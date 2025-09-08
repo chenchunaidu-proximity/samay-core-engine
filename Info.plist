@@ -23,7 +23,7 @@
             <string>Samay URL Scheme</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>activitywatch</string>
+                <string>samay</string>
             </array>
             <key>CFBundleURLIconFile</key>
             <string></string>

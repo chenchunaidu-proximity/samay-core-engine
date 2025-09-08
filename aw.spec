@@ -185,5 +185,13 @@ if platform.system() == "Darwin":
             "CFBundleVersion": current_release.lstrip("v"),
             # Replaced by the 'version' kwarg above
             # "CFBundleShortVersionString": current_release.lstrip('v'),
+            # URL scheme configuration
+            "CFBundleURLTypes": [
+                {
+                    "CFBundleURLName": "Samay URL Scheme",
+                    "CFBundleURLSchemes": ["samay"],
+                    "CFBundleURLIconFile": ""
+                }
+            ],
         },
     )
