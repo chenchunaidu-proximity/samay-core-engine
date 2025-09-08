@@ -1,0 +1,166 @@
+# ActivityWatch Demo Progress Tracking
+
+## Overview
+This document tracks the progress made in the `demo_prep` branch, documenting key features and customizations implemented for the ActivityWatch demo.
+
+## Key Features Implemented
+
+### 1. URL Scheme Integration
+- **Purpose**: Enable ActivityWatch to be opened from web URLs and automatically sync data with backend APIs
+- **Implementation**: 
+  - Added `Info.plist` file for macOS URL scheme support (`samay://`)
+  - Implemented token storage in database (both Peewee/SQLite and Memory backends)
+  - Created URL scheme handling API endpoint (`POST /api/0/url-scheme`)
+  - Added token management endpoints (`GET/POST/DELETE /api/0/token`)
+
+### 2. Backend API Integration
+- **Purpose**: Automatically sync local events to external backend API
+- **Implementation**:
+  - Modified scheduler to call backend API every 10 minutes
+  - Sends events to configurable backend endpoint (default: `http://localhost:3000/activities`)
+  - Uses stored authentication token for API calls
+  - Only deletes local events after successful API transmission
+  - No retry logic for failed API calls (as requested)
+
+### 3. Custom Branding ("Samay")
+- **Purpose**: Rebrand ActivityWatch for demo purposes
+- **Changes**:
+  - App name: "ActivityWatch" → "Samay"
+  - Bundle identifier: `net.activitywatch.ActivityWatch` → `net.samay.Samay`
+  - App bundle: `ActivityWatch.app` → `Samay.app`
+  - DMG file: `ActivityWatch.dmg` → `Samay.dmg`
+  - All build scripts and configurations updated
+
+### 4. Custom Submodule Repositories
+- **Purpose**: Use custom forks for development and testing
+- **Changes**:
+  - `aw-core`: `ActivityWatch/aw-core.git` → `chenchunaidu-proximity/aw-core.git`
+  - `aw-notify`: `ErikBjare/aw-notify.git` → `chenchunaidu-proximity/aw-notify.git`
+
+## Files Added/Modified
+
+### New Files Created
+- `Info.plist` - macOS app configuration with URL scheme support
+- `URL_SCHEME_README.md` - Comprehensive documentation for URL scheme functionality
+- `url_scheme_example.py` - Example script for testing URL scheme integration
+
+### Modified Files
+- `aw.spec` - Updated PyInstaller configuration for custom branding
+- `Makefile` - Updated build targets for "Samay" branding
+- `scripts/notarize.sh` - Updated bundle identifiers and file paths
+- `scripts/package/activitywatch-setup.iss` - Updated Windows installer branding
+- `scripts/package/dmgbuild-settings.py` - Updated DMG build settings
+- `scripts/build_changelog.py` - Fixed macOS download link naming
+- `.gitmodules` - Updated submodule URLs to custom repositories
+
+## API Endpoints Added
+
+### Token Management
+```bash
+# Get current token
+GET /api/0/token
+
+# Store token directly
+POST /api/0/token
+Content-Type: application/json
+{"token": "your-token-here"}
+
+# Delete token
+DELETE /api/0/token
+```
+
+### URL Scheme Processing
+```bash
+# Process URL scheme
+POST /api/0/url-scheme
+Content-Type: application/json
+{"url": "samay://token?token=your-token-here"}
+```
+
+## Usage Examples
+
+### Setting Up Token via URL Scheme
+```javascript
+// From web application
+window.location.href = `samay://token?token=${userToken}`;
+```
+
+```bash
+# From command line
+open "samay://token?token=your-token-here"
+```
+
+### Backend API Format
+The scheduler sends events to the backend API in this format:
+```json
+{
+  "events": [
+    {
+      "id": 123,
+      "timestamp": "2024-01-01T10:00:00+00:00",
+      "duration": 3600.0,
+      "data": {
+        "app": "Chrome",
+        "title": "Example Page"
+      },
+      "bucket_id": "aw-watcher-window"
+    }
+  ],
+  "timestamp": "2024-01-01T11:00:00+00:00"
+}
+```
+
+**Headers:**
+- `Authorization: Bearer YOUR_TOKEN`
+- `Content-Type: application/json`
+
+## Database Schema
+
+### Token Table (Peewee Storage)
+```sql
+CREATE TABLE tokenmodel (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token VARCHAR UNIQUE NOT NULL,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Configuration
+
+### Scheduler Settings
+- Runs every 10 minutes by default
+- Configurable via `--scheduler-interval` parameter
+- Backend API endpoint: `http://localhost:3000/activities` (hardcoded)
+
+## Security Considerations
+- Tokens stored in local database
+- URL scheme validation ensures only `samay://` URLs are processed
+- Host header validation protects against DNS rebinding attacks
+- No token validation performed (backend should validate tokens)
+
+## Testing
+Use the provided test script to verify functionality:
+```bash
+python url_scheme_example.py
+```
+
+## Status
+- ✅ URL scheme integration implemented
+- ✅ Token storage and management working
+- ✅ Backend API synchronization implemented
+- ✅ Custom branding applied
+- ✅ Documentation created
+- ✅ Test script provided
+
+## Next Steps
+- [ ] Test URL scheme functionality in production environment
+- [ ] Verify backend API integration works with real backend
+- [ ] Consider adding retry logic for failed API calls
+- [ ] Add configuration options for backend API endpoint
+- [ ] Implement token validation if needed
+
+## Notes
+- The `test` branch represents the official ActivityWatch project without these customizations
+- This `demo_prep` branch contains all the custom features for the demo
+- All changes are backward compatible with the original ActivityWatch functionality
