@@ -66,6 +66,15 @@ This document tracks the progress made in the `demo_prep` branch, documenting ke
 - **`/aw-server/aw_server/scheduler.py`** - Modified to send events to backend API every 10 minutes
 - **`/aw-server/aw_server/server.py`** - Updated to include new API endpoints and token storage
 
+### Key Code Changes in aw-qt Files (Custom "Samay" Branding)
+- **`/aw-qt/aw_qt/main.py`** - Help text: "A trayicon and service manager for Samay"
+- **`/aw-qt/aw_qt/trayicon.py`** - Tooltip and menu text: "Samay" branding
+- **`/aw-qt/aw_qt.spec`** - Bundle name: "Samay.app"
+- **`/aw-qt/resources/aw-qt.desktop`** - Desktop entry name and icon: "Samay"
+- **`/aw-qt/media/`** - Updated submodule to newer commit
+
+**Status**: ✅ **IMPLEMENTED** - The `demo_prep` branch has "Samay" branding fully implemented in aw-qt. The `test` branch reverts these changes back to "ActivityWatch".
+
 ## API Endpoints Added
 
 ### Token Management
