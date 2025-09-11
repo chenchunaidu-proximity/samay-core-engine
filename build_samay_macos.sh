@@ -219,6 +219,37 @@ fix_static_directory() {
     print_success "Static directory created"
 }
 
+# Function to clear logs
+clear_logs() {
+    print_status "Clearing previous logs..."
+    
+    # Clear aw-qt logs
+    if [ -d "$HOME/Library/Logs/activitywatch/aw-qt" ]; then
+        rm -f "$HOME/Library/Logs/activitywatch/aw-qt"/*.log
+        print_success "Cleared aw-qt logs"
+    fi
+    
+    # Clear aw-server logs
+    if [ -d "$HOME/Library/Logs/activitywatch/aw-server" ]; then
+        rm -f "$HOME/Library/Logs/activitywatch/aw-server"/*.log
+        print_success "Cleared aw-server logs"
+    fi
+    
+    # Clear aw-watcher-window logs
+    if [ -d "$HOME/Library/Logs/activitywatch/aw-watcher-window" ]; then
+        rm -f "$HOME/Library/Logs/activitywatch/aw-watcher-window"/*.log
+        print_success "Cleared aw-watcher-window logs"
+    fi
+    
+    # Clear aw-notify logs
+    if [ -d "$HOME/Library/Logs/activitywatch/aw-notify" ]; then
+        rm -f "$HOME/Library/Logs/activitywatch/aw-notify"/*.log
+        print_success "Cleared aw-notify logs"
+    fi
+    
+    print_success "All logs cleared successfully!"
+}
+
 # Function to build the app
 build_app() {
     print_status "Building Samay macOS app..."
@@ -269,7 +300,10 @@ create_dmg() {
         
         # Create temporary DMG
         TEMP_DMG="temp_samay.dmg"
-        DMG_NAME="dist/installers/macos/Samay-$(date +%Y%m%d).dmg"
+        DMG_NAME="dist/installers/macos/Samay-$(date +%Y_%m_%d_t_%H_%M_%S).dmg"
+        
+        # Store DMG name globally for final output
+        CREATED_DMG_NAME="$DMG_NAME"
         
         hdiutil create -srcfolder dist/app/Samay.app -volname "Samay" -fs HFS+ -fsargs "-c c=64,a=16,e=16" -format UDRW -size 200m "$TEMP_DMG"
         
@@ -312,6 +346,7 @@ main() {
     local CREATE_DMG=true
     local CLEAN_ONLY=false
     local FORCE_RECREATE_VENV=false
+    CREATED_DMG_NAME=""  # Initialize global DMG name variable
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -363,6 +398,9 @@ main() {
     # Fix static directory
     fix_static_directory
     
+    # Clear previous logs
+    clear_logs
+    
     # Build the app
     build_app
     
@@ -378,7 +416,11 @@ main() {
     print_success "🎉 Samay Core Engine build completed successfully!"
     print_status ""
     print_status "📦 Distribution Files:"
-    print_status "  • DMG Installer: dist/installers/macos/Samay-$(date +%Y%m%d).dmg (for users)"
+    if [ -n "$CREATED_DMG_NAME" ]; then
+        print_status "  • DMG Installer: $CREATED_DMG_NAME (for users)"
+    else
+        print_status "  • DMG Installer: Not created (use --no-dmg to skip)"
+    fi
     print_status "  • App Bundle: dist/app/Samay.app (for development)"
     print_status ""
     print_status "🚀 For Users: Share the DMG file - they can drag & drop to install"
