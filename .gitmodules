@@ -16,3 +16,7 @@
 [submodule "aw-notify"]
 	path = aw-notify
 	url = git@github.com:chenchunaidu-proximity/aw-notify.git
+[submodule "aw-notify/media"]
+	url = git@github.com:chenchunaidu-proximity/media.git
+[submodule "aw-qt/media"]
+	url = git@github.com:chenchunaidu-proximity/media.git
