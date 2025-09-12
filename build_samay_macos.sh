@@ -250,6 +250,39 @@ clear_logs() {
     print_success "All logs cleared successfully!"
 }
 
+# Function to run tests first (test-driven build)
+run_tests_first() {
+    print_status "🧪 Running tests first (test-driven build)..."
+    echo ""
+    
+    # Check if test runner exists
+    if [ ! -f "tests/run_tests.sh" ]; then
+        print_error "Test runner not found: tests/run_tests.sh"
+        print_error "Cannot proceed with test-driven build"
+        exit 1
+    fi
+    
+    # Make test runner executable
+    chmod +x tests/run_tests.sh
+    
+    # Run tests for the specified environment
+    print_status "Running tests for environment: $ENVIRONMENT"
+    echo ""
+    
+    if ./tests/run_tests.sh "$ENVIRONMENT"; then
+        print_success "✅ All tests passed! Proceeding with build..."
+        echo ""
+    else
+        print_error "❌ Tests failed! Build aborted."
+        print_error "Please fix the failing tests before building."
+        echo ""
+        print_status "To run tests manually:"
+        print_status "  ./tests/run_tests.sh $ENVIRONMENT"
+        echo ""
+        exit 1
+    fi
+}
+
 # Function to build the app
 build_app() {
     print_status "Building Samay macOS app..."
@@ -326,7 +359,9 @@ create_dmg() {
 show_usage() {
     echo "Samay Core Engine Build Script"
     echo ""
-    echo "Usage: $0 [OPTIONS]"
+    echo "Usage: $0 [ENVIRONMENT] [OPTIONS]"
+    echo ""
+    echo "This script runs tests first, then builds only if all tests pass."
     echo ""
     echo "Options:"
     echo "  --clean-only           Only clean previous builds"
@@ -334,11 +369,20 @@ show_usage() {
     echo "  --force-recreate-venv  Force recreation of virtual environment"
     echo "  --help                 Show this help message"
     echo ""
+    echo "Environments:"
+    echo "  qa                     Build for QA environment (localhost:3001)"
+    echo "  prod                   Build for Production environment (default)"
+    echo ""
     echo "Examples:"
-    echo "  $0                        # Full build process"
+    echo "  $0                        # Full build process (prod)"
+    echo "  $0 qa                     # Build for QA environment"
     echo "  $0 --clean-only           # Only clean"
     echo "  $0 --no-dmg               # Build without DMG"
     echo "  $0 --force-recreate-venv  # Force recreate venv (useful for dependency updates)"
+    echo ""
+    echo "Testing:"
+    echo "  ./tests/run_tests.sh qa              # Test QA environment"
+    echo "  ./tests/run_tests.sh prod             # Test production environment"
 }
 
 # Main build function
@@ -367,6 +411,11 @@ main() {
                 show_usage
                 exit 0
                 ;;
+            qa|prod)
+                # Environment parameter
+                ENVIRONMENT="$1"
+                shift
+                ;;
             *)
                 print_error "Unknown option: $1"
                 show_usage
@@ -375,8 +424,30 @@ main() {
         esac
     done
     
+    # Set default environment if not specified
+    ENVIRONMENT=${ENVIRONMENT:-"prod"}
+    
+    # Set Frontend URL based on environment
+    case $ENVIRONMENT in
+        "qa")
+            FRONTEND_URL="http://localhost:3001/login"
+            ;;
+        "prod"|*)
+            FRONTEND_URL="https://getsamay.vercel.app/login"
+            ;;
+    esac
+    
+    print_status "Building for environment: $ENVIRONMENT"
+    print_status "Frontend URL: $FRONTEND_URL"
+    
+    # Export for PyInstaller
+    export SAMAY_FRONTEND_URL="$FRONTEND_URL"
+    
     print_status "Starting Samay Core Engine build process..."
     echo ""
+    
+    # Run tests first (test-driven build)
+    run_tests_first
     
     # Check prerequisites
     check_python

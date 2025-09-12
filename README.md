@@ -7,19 +7,46 @@ A privacy-focused desktop application for automated time tracking and activity m
 ### Automated Build (Recommended)
 
 ```bash
-# For macOS
+# Production build (default)
 ./build_samay_macos.sh
 
-# For Linux (coming soon)
-./build_samay_linux.sh
+# QA build
+./build_samay_macos.sh qa
 
-# For Windows (coming soon)
-./build_samay_windows.sh
+# Production build (explicit)
+./build_samay_macos.sh prod
 ```
 
-This will create:
-- **DMG Installer**: `dist/installers/macos/Samay-YYYYMMDD.dmg` (for macOS users)
-- **AppImage**: `dist/installers/linux/Samay-YYYYMMDD.AppImage` (for Linux users)
-- **EXE Installer**: `dist/installers/windows/Samay-YYYYMMDD.exe` (for Windows users)
+### Build Options
 
+```bash
+# Show all options
+./build_samay_macos.sh --help
+
+# Clean previous builds only
+./build_samay_macos.sh --clean-only
+
+# Build without creating DMG
+./build_samay_macos.sh --no-dmg
+```
+
+## Testing
+
+```bash
+# Test production environment (default)
+./tests/run_tests.sh
+
+# Test QA environment
+./tests/run_tests.sh qa
+
+# Test production environment (explicit)
+./tests/run_tests.sh prod
+```
+
+## Build Output
+
+This will create:
+- **DMG Installer**: `dist/installers/macos/Samay-YYYY_MM_DD_t_HH_MM_SS.dmg` (for macOS users)
 - **App Bundle**: `dist/app/Samay.app` (for development)
+
+*Linux and Windows builds coming soon*
