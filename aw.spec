@@ -108,6 +108,7 @@ aw_qt_a = build_analysis(
         (aw_qt_location / "resources/aw-qt.desktop", "aw_qt/resources"),
         (aw_qt_location / "media", "aw_qt/media"),
     ],
+    hiddenimports=["keyring.backends.macOS", "keyrings.alt"],
 )
 aw_server_a = build_analysis(
     "aw-server",

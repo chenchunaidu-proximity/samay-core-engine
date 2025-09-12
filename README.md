@@ -1,22 +1,52 @@
-# Samay core engine / desktop app
+# Samay Core Engine
 
-This repo is used for creating dekstop app for samay. This app tracks user activity and send data to backend.
+A privacy-focused desktop application for automated time tracking and activity monitoring. Built on the ActivityWatch foundation with custom branding and enhanced authentication features.
 
-## Setup
+## Quick Start
 
-1. To setup this create python virtual env using ` python -m venv activity-watch-venv` command
-2. cd into `activity-watch-venv`
-3. Create `src` folder
-4. Activate venv by running `source <PATH_TO_activity-watch-venv_FOLDER>/bin`
-5. Clone this repo in src folder
-6. You can run build by running `make build` in main folder
-7. You build .dmg file by running `make dist/Samay.dmg`
-8. It will create dmg file under `dist` folder
+### Automated Build (Recommended)
 
-## Logs
+```bash
+# Production build (default)
+./build_samay_macos.sh
 
-1. You can check if something is wrong in logs
-2. Click on app icon upper bar
-3. Click on open log folder
-4. It will open a folder with 5 sub folders
-5. You can logs in any one of them to check logs
+# QA build
+./build_samay_macos.sh qa
+
+# Production build (explicit)
+./build_samay_macos.sh prod
+```
+
+### Build Options
+
+```bash
+# Show all options
+./build_samay_macos.sh --help
+
+# Clean previous builds only
+./build_samay_macos.sh --clean-only
+
+# Build without creating DMG
+./build_samay_macos.sh --no-dmg
+```
+
+## Testing
+
+```bash
+# Test production environment (default)
+./tests/run_tests.sh
+
+# Test QA environment
+./tests/run_tests.sh qa
+
+# Test production environment (explicit)
+./tests/run_tests.sh prod
+```
+
+## Build Output
+
+This will create:
+- **DMG Installer**: `dist/installers/macos/Samay-YYYY_MM_DD_t_HH_MM_SS.dmg` (for macOS users)
+- **App Bundle**: `dist/app/Samay.app` (for development)
+
+*Linux and Windows builds coming soon*
